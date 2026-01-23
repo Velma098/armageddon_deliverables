@@ -7,10 +7,10 @@ Instance Name: lab-ec2-app
 
 Database: lab-mysql
 
-VPC CIDR: 10.180.0.0/16
+VPC CIDR: 10.190.0.0/16
 
-Subnet CIDRs: public - 10.180.1.0/24, 10.180.2.0/24 
-              private - 10.180.11.0/24, 10.180.12.0/24
+Subnet CIDRs: public - 10.190.1.0/24, 10.190.2.0/24 
+              private - 10.190.11.0/24, 10.190.12.0/24
 
 
 Security groups: sg-ec2-lab: armageddon-public-sg - sg-ec2-lab for TCP 3306: armageddon-db-sg
@@ -122,11 +122,11 @@ alias/aws/rds}
 
 ```bash
 aws ec2 describe-security-groups --max-results '1000' 
-aws ec2 create-subnet --tag-specifications '{"ResourceType":"subnet","Tags":[{"Key":"Name","Value":"RDS-Pvt-subnet-2"}]}' --vpc-id 'vpc-0707f3739f7f3db68' --cidr-block '10.180.3.0/25' --availability-zone-id 'use1-az5' 
-aws ec2 create-subnet --tag-specifications '{"ResourceType":"subnet","Tags":[{"Key":"Name","Value":"RDS-Pvt-subnet-1"}]}' --vpc-id 'vpc-0707f3739f7f3db68' --cidr-block '10.180.0.128/25' --availability-zone-id 'use1-az1' 
-aws ec2 create-subnet --tag-specifications '{"ResourceType":"subnet","Tags":[{"Key":"Name","Value":"RDS-Pvt-subnet-5"}]}' --vpc-id 'vpc-0707f3739f7f3db68' --cidr-block '10.180.4.128/25' --availability-zone-id 'use1-az3' 
-aws ec2 create-subnet --tag-specifications '{"ResourceType":"subnet","Tags":[{"Key":"Name","Value":"RDS-Pvt-subnet-4"}]}' --vpc-id 'vpc-0707f3739f7f3db68' --cidr-block '10.180.4.0/25' --availability-zone-id 'use1-az6' 
-aws ec2 create-subnet --tag-specifications '{"ResourceType":"subnet","Tags":[{"Key":"Name","Value":"RDS-Pvt-subnet-3"}]}' --vpc-id 'vpc-0707f3739f7f3db68' --cidr-block '10.180.3.128/25' --availability-zone-id 'use1-az2' 
+aws ec2 create-subnet --tag-specifications '{"ResourceType":"subnet","Tags":[{"Key":"Name","Value":"RDS-Pvt-subnet-2"}]}' --vpc-id 'vpc-0707f3739f7f3db68' --cidr-block '10.190.3.0/25' --availability-zone-id 'use1-az5' 
+aws ec2 create-subnet --tag-specifications '{"ResourceType":"subnet","Tags":[{"Key":"Name","Value":"RDS-Pvt-subnet-1"}]}' --vpc-id 'vpc-0707f3739f7f3db68' --cidr-block '10.190.0.128/25' --availability-zone-id 'use1-az1' 
+aws ec2 create-subnet --tag-specifications '{"ResourceType":"subnet","Tags":[{"Key":"Name","Value":"RDS-Pvt-subnet-5"}]}' --vpc-id 'vpc-0707f3739f7f3db68' --cidr-block '10.190.4.128/25' --availability-zone-id 'use1-az3' 
+aws ec2 create-subnet --tag-specifications '{"ResourceType":"subnet","Tags":[{"Key":"Name","Value":"RDS-Pvt-subnet-4"}]}' --vpc-id 'vpc-0707f3739f7f3db68' --cidr-block '10.190.4.0/25' --availability-zone-id 'use1-az6' 
+aws ec2 create-subnet --tag-specifications '{"ResourceType":"subnet","Tags":[{"Key":"Name","Value":"RDS-Pvt-subnet-3"}]}' --vpc-id 'vpc-0707f3739f7f3db68' --cidr-block '10.190.3.128/25' --availability-zone-id 'use1-az2' 
 aws ec2 create-security-group --group-name 'rds-ec2-1' --description 'Security group attached to labmysql to allow EC2 instances with specific security groups attached to connect to the database. Modification could lead to connection loss.' --vpc-id 'vpc-0707f3739f7f3db68' 
 aws ec2 create-security-group --group-name 'ec2-rds-1' --description 'Security group attached to instances to securely connect to labmysql. Modification could lead to connection loss.' --vpc-id 'vpc-0707f3739f7f3db68' 
 aws ec2 authorize-security-group-ingress --group-id 'sg-08d3a4970b1fc3cc6' --ip-permissions '{"FromPort":3306,"ToPort":3306,"IpProtocol":"tcp","UserIdGroupPairs":[{"Description":"Rule to allow connections from EC2 instances with sg-035a80eadd1126f61 attached","GroupId":"sg-035a80eadd1126f61"}]}' 

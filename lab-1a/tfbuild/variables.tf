@@ -7,7 +7,7 @@ variable "aws_region" {
 variable "project_name" {
   description = "Prefix for naming. Students should change from 'chewbacca' to their own."
   type        = string
-  default     = "dawgs_armageddon"
+  default     = "dawgs_armageddon_1"
 }
 
 variable "vpc_cidr" {
@@ -83,44 +83,44 @@ variable "sns_email_endpoint" {
   default     = "firstofmyname5802@outlook.com" # TODO: student supplies
 }
 
-# variable "domain_name" {
-#   description = "Base domain students registered (e.g., chewbacca-growl.com)."
-#   type        = string
-#   default     = "chewbacca-growl.com"
-# }
+variable "domain_name" {
+  description = "Base domain students registered (e.g., thedawgs2025.click)."
+  type        = string
+  default     = "thedawgs2025.click"
+}
 
-# variable "app_subdomain" {
-#   description = "App hostname prefix (e.g., app.chewbacca-growl.com)."
-#   type        = string
-#   default     = "app"
-# }
+variable "app_subdomain" {
+  description = "App hostname prefix (e.g., app.thedawgs2025.click)."
+  type        = string
+  default     = "app"
+}
 
-# variable "certificate_validation_method" {
-#   description = "ACM validation method. Students can do DNS (Route53) or EMAIL."
-#   type        = string
-#   default     = "DNS"
-# }
+variable "certificate_validation_method" {
+  description = "ACM validation method. Students can do DNS (Route53) or EMAIL."
+  type        = string
+  default     = "DNS"
+}
 
-# variable "enable_waf" {
-#   description = "Toggle WAF creation."
-#   type        = bool
-#   default     = true
-# }
+variable "enable_waf" {
+  description = "Toggle WAF creation."
+  type        = bool
+  default     = true
+}
 
-# variable "alb_5xx_threshold" {
-#   description = "Alarm threshold for ALB 5xx count."
-#   type        = number
-#   default     = 10
-# }
+variable "alb_5xx_threshold" {
+  description = "Alarm threshold for ALB 5xx count."
+  type        = number
+  default     = 10
+}
 
-# variable "alb_5xx_period_seconds" {
-#   description = "CloudWatch alarm period."
-#   type        = number
-#   default     = 300
-# }
+variable "alb_5xx_period_seconds" {
+  description = "CloudWatch alarm period."
+  type        = number
+  default     = 300
+}
 
-# variable "alb_5xx_evaluation_periods" {
-#   description = "Evaluation periods for alarm."
-#   type        = number
-#   default     = 1
-# }
+variable "alb_5xx_evaluation_periods" {
+  description = "Evaluation periods for alarm."
+  type        = number
+  default     = 1
+}
