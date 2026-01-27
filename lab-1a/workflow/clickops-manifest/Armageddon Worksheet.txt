@@ -287,7 +287,7 @@ changed from my IP to 0.0.0.0/0 and still no connection.
 
 <RDS_ENDPOINT>
 
-mysql -h <RDS_ENDPOINT> -u admin -p
+mysql -h dawgs-armageddon-rds01.c89ykq22i31z.us-east-1.rds.amazonaws.com -u admin -p
 
 DawgsRDSPass123
 

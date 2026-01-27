@@ -7,7 +7,7 @@ variable "aws_region" {
 variable "project_name" {
   description = "Prefix for naming. Students should change from 'chewbacca' to their own."
   type        = string
-  default     = "dawgs_armageddon_1"
+  default     = "lab"
 }
 
 variable "vpc_cidr" {
@@ -101,26 +101,26 @@ variable "certificate_validation_method" {
   default     = "DNS"
 }
 
-variable "enable_waf" {
-  description = "Toggle WAF creation."
-  type        = bool
-  default     = true
-}
+# variable "enable_waf" {
+#   description = "Toggle WAF creation."
+#   type        = bool
+#   default     = true
+# }
 
-variable "alb_5xx_threshold" {
-  description = "Alarm threshold for ALB 5xx count."
-  type        = number
-  default     = 10
-}
+# variable "alb_5xx_threshold" {
+#   description = "Alarm threshold for ALB 5xx count."
+#   type        = number
+#   default     = 10
+# }
 
-variable "alb_5xx_period_seconds" {
-  description = "CloudWatch alarm period."
-  type        = number
-  default     = 300
-}
+# variable "alb_5xx_period_seconds" {
+#   description = "CloudWatch alarm period."
+#   type        = number
+#   default     = 300
+# }
 
-variable "alb_5xx_evaluation_periods" {
-  description = "Evaluation periods for alarm."
-  type        = number
-  default     = 1
-}
+# variable "alb_5xx_evaluation_periods" {
+#   description = "Evaluation periods for alarm."
+#   type        = number
+#   default     = 1
+# }

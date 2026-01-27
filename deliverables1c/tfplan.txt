@@ -1,0 +1,18 @@
+# terraform plan output
+
+Plan: 40 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + dawgs-armageddon_ec2_instance_id    = (known after apply)
+  + dawgs-armageddon_log_group_name     = "/aws/ec2/lab-rds-app"
+  + dawgs-armageddon_private_subnet_ids = [
+      + (known after apply),
+      + (known after apply),
+    ]
+  + dawgs-armageddon_public_subnet_ids  = [
+      + (known after apply),
+      + (known after apply),
+    ]
+  + dawgs-armageddon_rds_endpoint       = (known after apply)
+  + dawgs-armageddon_sns_topic_arn      = (known after apply)
+  + dawgs-armageddon_vpc_id             = (known after apply)

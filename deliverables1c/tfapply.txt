@@ -1,0 +1,15 @@
+# terraform apply
+
+dawgs-armageddon_ec2_instance_id = "i-034f600330d6e8582"
+dawgs-armageddon_log_group_name = "/aws/ec2/lab-rds-app"
+dawgs-armageddon_private_subnet_ids = [
+  "subnet-0b9d6e81ccd4dced0",
+  "subnet-00072ac49d7e14b0e",
+]
+dawgs-armageddon_public_subnet_ids = [
+  "subnet-029fab56e21a9ca8b",
+  "subnet-0fe399203d35848c9",
+]
+dawgs-armageddon_rds_endpoint = "lab-rds01.c89ykq22i31z.us-east-1.rds.amazonaws.com"
+dawgs-armageddon_sns_topic_arn = "arn:aws:sns:us-east-1:778185677715:lab-db-incidents"
+dawgs-armageddon_vpc_id = "vpc-068d1fd4fc05e9d80"
