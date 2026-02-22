@@ -79,42 +79,11 @@ This policy gave an error of missing principal and role trust policy Syntax Erro
     }
   ]
 }
-```bash
-aws ssm describe-instance-information --filters '{"Key":"InstanceIds","Values":["instance-id-here"]}'\
-aws ec2 describe-instance-status --instance-ids 'instance-id-here' \
-aws ec2 describe-network-interfaces --filters '{"Name":"attachment.instance-id","Values":["instance-id-here"]}'\
-aws iam get-instance-profile --instance-profile-name 'secrets_manger_get_secret'\
-aws ec2 describe-instance-status --instance-ids 'instance-id-here'\
-aws health describe-events --filter '{"services":["EC2"],"entityValues":["instance-id-here"],"eventTypeCodes":["AWS_EC2_SIMPLIFIED_AUTO_RECOVERY_SUCCESS","AWS_EC2_INSTANCE_AUTO_RECOVERY_SUCCESS","AWS_EC2_SIMPLIFIED_AUTO_RECOVERY_FAILURE","AWS_EC2_INSTANCE_AUTO_RECOVERY_FAILURE"],"startTimes":[{"from":"2026-01-01T05:16:02.649Z"}]}'\  
-aws compute-optimizer get-enrollment-status\
-aws ec2 describe-instance-status --instance-ids 'instance-id-here'\
-aws ec2 describe-instance-credit-specifications --instance-ids 'instance-id-here'\
-aws ec2 describe-instance-attribute --instance-id 'instance-id-here' --attribute 'disableApiStop'\
-aws ec2 describe-instance-attribute --instance-id 'instance-id-here' --attribute 'disableApiTermination'\
-aws ec2 describe-network-interfaces --filters '{"Name":"attachment.instance-id","Values":["instance-id-here"]}'\
-aws ec2 describe-addresses --filters '{"Name":"instance-id","Values":["instance-id-here"]}'\
-aws ec2 describe-instances --instance-ids 'instance-id-here'\
-aws ec2 describe-replace-root-volume-tasks --filters '{"Name":"instance-id","Values":["instance-id-here"]}' --max-results '50'\
-aws ec2 describe-volumes --volume-ids 'vol-0df83d20f2757d866'\
-aws ec2 describe-instance-status --instance-ids 'instance-id-here'\
-aws ec2 describe-instances --max-results '100'\
-aws ec2 describe-tags --max-results '1000' --filters '{"Name":"resource-type","Values":["instance"]}'\
-aws ec2 describe-account-attributes\
-aws ec2 associate-iam-instance-profile --instance-id 'instance-id-here' --iam-instance-profile '{"Arn":"arn:aws:iam::778185677715:instance-profile/secrets_manger_get_secret","Name":"secrets_manger_get_secret"}'\
-```
-terminate instance
-```bash
-aws ec2 describe-addresses --filters '{"Name":"instance-id","Values":["instance-id-here"]}' 
-aws ec2 describe-instance-attribute --instance-id 'instance-id-here' --attribute 'disableApiTermination' 
-aws ec2 terminate-instances --instance-ids 'instance-id-here' 
-aws ec2 describe-instances --instance-ids 'instance-id-here' 
-aws ec2 describe-instances --instance-ids 'instance-id-here' 
-```
 create database:
--	Aurora Database: lab-mysql > full configuration > MySQL > MySQL 8.0.43 > dev/test > 2 azs > 
+-	Aurora Database: lab-mysql > full configuration > MySQL > MySQL 8.4.7 > dev/test > 2 azs > 
 admin (username) > self managed > easy password until we create secrets manager configuration (DawgsRDSPass123) > 
-General purpose > Not connecting to instance yet (there isn't one) > public access no > Not creating a database sg > 
-choose existing sg > us-east-1 >Port 3306 > Tag
+General purpose > Not connecting to instance yet (there isn't one) > public access no > Already created database security group > 
+choose existing sg > us-east -1 >Port 3306 > Tag
 {KMS key ID
 alias/aws/rds}
 

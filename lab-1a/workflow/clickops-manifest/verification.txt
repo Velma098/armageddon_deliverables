@@ -1,22 +1,50 @@
-===========================================
----------------------------------------------------------------------------
-|                         DescribeSecurityGroups                          |
-+----------------------+------------------------+-------------------------+
-|        GroupId       |         Name           |          VpcId          |
-+----------------------+------------------------+-------------------------+
-|  sg-023a5f31e8d1b087c|  armageddon-db-sg      |  vpc-013c423ca14ee628e  |
-|  sg-04b3848fabc278d8d|  default               |  vpc-013c423ca14ee628e  |
-|  sg-0d535c9d5a698237c|  default               |  vpc-035440d5ab0a4ab71  |
-|  sg-06ad0071312fd450d|  nvadefsg1             |  vpc-035440d5ab0a4ab71  |
-|  sg-0afe423aa62c643f1|  demo-alb-sec          |  vpc-035440d5ab0a4ab71  |
-|  sg-01a0f1bc58d478430|  armageddon-public-sg  |  vpc-013c423ca14ee628e  |
-+----------------------+------------------------+-------------------------+
+aws ec2 describe-instances \
+  --filters "Name=tag:Name,Values=lab-ec2-app" \
+  --query "Reservations[].Instances[].InstanceId"
+[
+    "i-049d2fe74d3782ba8"
+]
 
-===========================================
+
+ aws ec2 describe-instances \
+  --instance-ids i-049d2fe74d3782ba8 \
+  --query "Reservations[].Instances[].IamInstanceProfile.Arn"
+[
+    "arn:aws:iam::778185677715:instance-profile/secrets_manger_get_secret"
+]
+
+
+
+aws rds describe-db-instances \
+  --db-instance-identifier lab-mysql \
+  --query "DBInstances[].Endpoint"
+[
+    {
+        "Address": "lab-mysql.c89ykq22i31z.us-east-1.rds.amazonaws.com",
+        "Port": 3306,
+        "HostedZoneId": "Z2R2ITUGPM61AM"
+    }
+]
+
+######
+ aws ec2 describe-security-groups \
+      --region us-east-1 \
+      --query "SecurityGroups[].{GroupId:GroupId,Name:GroupName,VpcId:VpcId}" \
+      --output table
+
+
+|  sg-0e13d5c808412fafe|  armageddon-public-sg  |  vpc-0a71e07d430b1ef18  |
+|  sg-02f38cf01d520b7bc|  armageddon-db-sg      |  vpc-0a71e07d430b1ef18  | 
+
+#####
+aws ec2 describe-security-groups \
+      --group-ids sg-02f38cf01d520b7bc \
+      --region us-east-1 \
+      --output json
 {
     "SecurityGroups": [
         {
-            "GroupId": "sg-01a0f1bc58d478430",
+            "GroupId": "sg-02f38cf01d520b7bc",
             "IpPermissionsEgress": [
                 {
                     "IpProtocol": "-1",
@@ -32,12 +60,67 @@
             ],
             "Tags": [
                 {
-                    "Key": "name ",
+                    "Key": "name",
+                    "Value": "armageddon-db-sg"
+                }
+            ],
+            "VpcId": "vpc-0a71e07d430b1ef18",
+            "SecurityGroupArn": "arn:aws:ec2:us-east-1:778185677715:security-group/sg-02f38cf01d520b7bc",
+            "OwnerId": "778185677715",
+            "GroupName": "armageddon-db-sg",
+            "Description": "armageddon-db-sg",
+            "IpPermissions": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 3306,
+                    "ToPort": 3306,
+                    "UserIdGroupPairs": [
+                        {
+                            "Description": "instance-entry-point",
+                            "UserId": "778185677715",
+                            "GroupId": "sg-0e13d5c808412fafe"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ]
+        }
+    ]
+}
+
+
+######
+aws ec2 describe-security-groups \
+      --group-ids sg-0e13d5c808412fafe \
+      --region us-east-1 \
+      --output json
+{
+    "SecurityGroups": [
+        {
+            "GroupId": "sg-0e13d5c808412fafe",
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "-1",
+                    "UserIdGroupPairs": [],
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ],
+            "Tags": [
+                {
+                    "Key": "name",
                     "Value": "armageddon-public-sg"
                 }
             ],
-            "VpcId": "vpc-013c423ca14ee628e",
-            "SecurityGroupArn": "arn:aws:ec2:us-east-1:778185677715:security-group/sg-01a0f1bc58d478430",
+            "VpcId": "vpc-0a71e07d430b1ef18",
+            "SecurityGroupArn": "arn:aws:ec2:us-east-1:778185677715:security-group/sg-0e13d5c808412fafe",
             "OwnerId": "778185677715",
             "GroupName": "armageddon-public-sg",
             "Description": "armageddon-public-sg",
@@ -63,7 +146,7 @@
                     "UserIdGroupPairs": [],
                     "IpRanges": [
                         {
-                            "Description": "secure-shell",
+                            "Description": "ssh",
                             "CidrIp": "0.0.0.0/0"
                         }
                     ],
@@ -75,28 +158,53 @@
     ]
 }
 
-===========================================
-./security-checks-lab1a.sh: line 24: //: Is a directory
-./security-checks-lab1a.sh: line 25: Verify: command not found
-./security-checks-lab1a.sh: line 26: EC2: command not found
-./security-checks-lab1a.sh: line 27: //: Is a directory
+######
+
+ aws rds describe-db-instances \
+      --region us-east-1 \
+      --query "DBInstances[?contains(VpcSecurityGroups[].VpcSecurityGroupId, 'sg-02f38cf01d520b7bc')].DBInstanceIdentifier" \
+      --output table
+---------------------
+|DescribeDBInstances|
++-------------------+
+|  lab-mysql        |
++-------------------+
+
+
+
+######
+
+aws ec2 describe-instances \
+      --filters Name=instance.group-id,Values=sg-0e13d5c808412fafe \
+      --region us-east-1 \
+      --query "Reservations[].Instances[].InstanceId" \
+      --output table
 -------------------------
 |   DescribeInstances   |
 +-----------------------+
-|  i-0d38fc923280ebb68  |
+|  i-049d2fe74d3782ba8  |
 +-----------------------+
 
-===========================================
-===========================================
+#####
+
+aws rds describe-db-instances \
+      --region us-east-1 \
+      --query "DBInstances[].{DB:DBInstanceIdentifier,Engine:Engine,Public:PubliclyAccessible,Vpc:DBSubnetGroup.VpcId}" \
+      --output table
 ------------------------------------------------------------
 |                    DescribeDBInstances                   |
 +-----------+---------+---------+--------------------------+
 |    DB     | Engine  | Public  |           Vpc            |
 +-----------+---------+---------+--------------------------+
-|  lab-mysql|  mysql  |  False  |  vpc-013c423ca14ee628e   |
+|  lab-mysql|  mysql  |  False  |  vpc-0a71e07d430b1ef18   |
 +-----------+---------+---------+--------------------------+
 
-===========================================
+#####
+
+aws rds describe-db-instances \
+      --db-instance-identifier lab-mysql \
+      --region us-east-1 \
+      --output json
 {
     "DBInstances": [
         {
@@ -110,13 +218,13 @@
                 "HostedZoneId": "Z2R2ITUGPM61AM"
             },
             "AllocatedStorage": 200,
-            "InstanceCreateTime": "2026-01-15T00:18:23.018000+00:00",
-            "PreferredBackupWindow": "08:32-09:02",
+            "InstanceCreateTime": "2026-02-21T22:56:05.584000+00:00",
+            "PreferredBackupWindow": "10:22-10:52",
             "BackupRetentionPeriod": 7,
             "DBSecurityGroups": [],
             "VpcSecurityGroups": [
                 {
-                    "VpcSecurityGroupId": "sg-023a5f31e8d1b087c",
+                    "VpcSecurityGroupId": "sg-02f38cf01d520b7bc",
                     "Status": "active"
                 }
             ],
@@ -128,13 +236,13 @@
             ],
             "AvailabilityZone": "us-east-1a",
             "DBSubnetGroup": {
-                "DBSubnetGroupName": "rds-subnet-group",
-                "DBSubnetGroupDescription": "rds-subnet-group",
-                "VpcId": "vpc-013c423ca14ee628e",
+                "DBSubnetGroupName": "rds-lab-subnet-group",
+                "DBSubnetGroupDescription": "subnet-group-for-database",
+                "VpcId": "vpc-0a71e07d430b1ef18",
                 "SubnetGroupStatus": "Complete",
                 "Subnets": [
                     {
-                        "SubnetIdentifier": "subnet-030784edc268424b3",
+                        "SubnetIdentifier": "subnet-079dd341f1079317a",
                         "SubnetAvailabilityZone": {
                             "Name": "us-east-1a"
                         },
@@ -142,7 +250,7 @@
                         "SubnetStatus": "Active"
                     },
                     {
-                        "SubnetIdentifier": "subnet-0963e454eb1bc66a8",
+                        "SubnetIdentifier": "subnet-0145ff7c160f100ef",
                         "SubnetAvailabilityZone": {
                             "Name": "us-east-1b"
                         },
@@ -151,10 +259,10 @@
                     }
                 ]
             },
-            "PreferredMaintenanceWindow": "sun:03:26-sun:03:56",
+            "PreferredMaintenanceWindow": "mon:05:15-mon:05:45",
             "UpgradeRolloutOrder": "second",
             "PendingModifiedValues": {},
-            "LatestRestorableTime": "2026-01-15T00:45:00+00:00",
+            "LatestRestorableTime": "2026-02-21T23:20:00+00:00",
             "MultiAZ": false,
             "EngineVersion": "8.4.7",
             "AutoMinorVersionUpgrade": true,
@@ -173,12 +281,12 @@
             "DbInstancePort": 0,
             "StorageEncrypted": true,
             "KmsKeyId": "arn:aws:kms:us-east-1:778185677715:key/0c43d80e-5062-4769-9e8d-7b019c4785ac",
-            "DbiResourceId": "db-QVUZLEK4JUEGHOBOSCLIF6QJ6M",
+            "DbiResourceId": "db-EKF2XYZVZ2VEAN4U5Y2UD4EB24",
             "CACertificateIdentifier": "rds-ca-rsa2048-g1",
             "DomainMemberships": [],
             "CopyTagsToSnapshot": true,
             "MonitoringInterval": 60,
-            "EnhancedMonitoringResourceArn": "arn:aws:logs:us-east-1:778185677715:log-group:RDSOSMetrics:log-stream:db-QVUZLEK4JUEGHOBOSCLIF6QJ6M",
+            "EnhancedMonitoringResourceArn": "arn:aws:logs:us-east-1:778185677715:log-group:RDSOSMetrics:log-stream:db-EKF2XYZVZ2VEAN4U5Y2UD4EB24",
             "MonitoringRoleArn": "arn:aws:iam::778185677715:role/rds-monitoring-role",
             "DBInstanceArn": "arn:aws:rds:us-east-1:778185677715:db:lab-mysql",
             "IAMDatabaseAuthenticationEnabled": false,
@@ -208,7 +316,7 @@
             "BackupTarget": "region",
             "CertificateDetails": {
                 "CAIdentifier": "rds-ca-rsa2048-g1",
-                "ValidTill": "2027-01-15T00:16:41+00:00"
+                "ValidTill": "2027-02-21T22:54:47+00:00"
             },
             "DedicatedLogVolume": false,
             "IsStorageConfigUpgradeAvailable": false,
@@ -217,31 +325,406 @@
     ]
 }
 
-===========================================
+#####
 
-./security-checks-lab1a.sh: line 67: $'#Critical checks\n    PubliclyAccessible: false\n    Correct VPC\n    Correct subnet group\n    Correct security groups\n==================================================': command not found
+aws rds describe-db-instances \
+      --db-instance-identifier lab-mysql \
+      --region us-east-1 \
+      --query "DBInstances[].VpcSecurityGroups[].VpcSecurityGroupId" \
+      --output table
 --------------------------
 |   DescribeDBInstances  |
 +------------------------+
-|  sg-023a5f31e8d1b087c  |
+|  sg-02f38cf01d520b7bc  |
 +------------------------+
 
-===========================================
------------------------------------------------
-|           DescribeDBSubnetGroups            |
-+-------------------+-------------------------+
-|       Name        |           Vpc           |
-+-------------------+-------------------------+
-|  rds-subnet-group |  vpc-013c423ca14ee628e  |
-+-------------------+-------------------------+
-||                  Subnets                  ||
-|+-------------------------------------------+|
-||  subnet-030784edc268424b3                 ||
-||  subnet-0963e454eb1bc66a8                 ||
-|+-------------------------------------------+|
+#####
 
-=============================
-./security-checks-lab1a.sh: line 90: $'What you’re verifying\n    Private subnets only\n    No IGW route\n    Correct AZ spread\n====================================': command not found
-./security-checks-lab1a.sh: line 91: //: Is a directory
-./security-checks-lab1a.sh: line 92: syntax error near unexpected token `('
-./security-checks-lab1a.sh: line 92: `Verify Network Exposure (Fast Sanity Checks)'
+aws rds describe-db-subnet-groups \
+      --region us-east-1 \
+      --query "DBSubnetGroups[].{Name:DBSubnetGroupName,Vpc:VpcId,Subnets:Subnets[].SubnetIdentifier}" \
+      --output table
+---------------------------------------------------
+|             DescribeDBSubnetGroups              |
++-----------------------+-------------------------+
+|         Name          |           Vpc           |
++-----------------------+-------------------------+
+|  rds-lab-subnet-group |  vpc-0a71e07d430b1ef18  |
++-----------------------+-------------------------+
+||                    Subnets                    ||
+|+-----------------------------------------------+|
+||  subnet-079dd341f1079317a                     ||
+||  subnet-0145ff7c160f100ef                     ||
+|+-----------------------------------------------+|
+
+#####
+
+aws rds describe-db-instances \
+      --db-instance-identifier lab-mysql \
+      --region us-east-1 \
+      --query "DBInstances[].PubliclyAccessible" \
+      --output text
+False
+
+######
+
+aws secretsmanager list-secrets \
+      --region us-east-1 \
+      --query "SecretList[].{Name:Name,ARN:ARN,Rotation:RotationEnabled}" \
+      --output table
+---------------------------------------------------------------------------------------------------------
+|                                              ListSecrets
+                        |
++----------+--------------------------------------------------------------------------------------------+
+|  ARN     |  arn:aws:secretsmanager:us-east-1:778185677715:secret:dawgs-armageddon/rds/mysql/-lbwMwX   |
+|  Name    |  dawgs-armageddon/rds/mysql/
+                        |
+|  Rotation|  None
+                        |
++----------+--------------------------------------------------------------------------------------------+
+
+
+######
+
+ aws secretsmanager describe-secret \
+      --secret-id dawgs-armageddon/rds/mysql/ \
+      --region us-east-1 \
+      --output json
+{
+    "ARN": "arn:aws:secretsmanager:us-east-1:778185677715:secret:dawgs-armageddon/rds/mysql/-lbwMwX",
+    "Name": "dawgs-armageddon/rds/mysql/",
+    "Description": "access to mysql",
+    "LastChangedDate": "2026-02-21T17:37:00.461000-06:00",
+    "Tags": [
+        {
+            "Key": "name",
+            "Value": "dawgs-armageddon/rds/mysql/"
+        }
+    ],
+    "VersionIdsToStages": {
+        "c9999cce-abf1-4b46-b830-700f787b3d71": [
+            "AWSCURRENT"
+        ]
+    },
+    "CreatedDate": "2026-02-21T17:37:00.406000-06:00"
+}
+
+######
+
+aws secretsmanager get-resource-policy \
+      --secret-id dawgs-armageddon/rds/mysql/ \
+      --region us-east-1 \
+      --output json
+{
+    "ARN": "arn:aws:secretsmanager:us-east-1:778185677715:secret:dawgs-armageddon/rds/mysql/-lbwMwX",
+    "Name": "dawgs-armageddon/rds/mysql/"
+}
+
+#####
+
+ aws ec2 describe-instances \
+      --filters Name=tag:Name,Values=lab-ec2-app \
+      --region us-east-1 \
+      --query "Reservations[].Instances[].InstanceId" \
+      --output text
+i-049d2fe74d3782ba8
+
+#######
+
+aws ec2 describe-instances \
+      --instance-ids i-049d2fe74d3782ba8 \
+      --region us-east-1 \
+      --query "Reservations[].Instances[].IamInstanceProfile.Arn" \
+      --output text
+arn:aws:iam::778185677715:instance-profile/lab1a-run-2
+
+#######
+
+aws iam get-instance-profile \
+      --instance-profile-name lab1a-run-2 \
+      --query "InstanceProfile.Roles[].RoleName" \
+      --output text
+lab1a-run-2
+
+########
+
+ aws iam list-attached-role-policies \
+      --role-name lab1a-run-2 \
+      --output table
+---------------------------------------------------------------------------------
+|                           ListAttachedRolePolicies
+|
++-------------------------------------------------------------------------------+
+||                              AttachedPolicies                               ||
+|+------------+----------------------------------------------------------------+|
+||  PolicyArn |  arn:aws:iam::778185677715:policy/get_secrets_secret_manager   ||
+||  PolicyName|  get_secrets_secret_manager                                    ||
+|+------------+----------------------------------------------------------------+
+
+#######
+
+aws iam list-role-policies \
+      --role-name lab1a-run-2 \
+      --output table
+------------------
+|ListRolePolicies|
++----------------+
+
+'no inline'
+
+#######
+
+ aws iam get-policy-version \
+      --policy-arn arn:aws:iam::aws:policy/get_secrets_secret_manager \
+      --version-id v1 \
+      --output json
+
+An error occurred (NoSuchEntity) when calling the GetPolicyVersion operation: Policy arn:aws:iam::aws:policy/get_secrets_secret_manager version v1 does not exist or is not attachable.
+
+'no version of this policy on AWS, since customer managed'
+
+
+#######
+
+SSH into EC2 and run:
+aws secretsmanager get-secret-value \
+  --secret-id dawgs-armageddon/rds/mysql/
+{
+    "ARN": "arn:aws:secretsmanager:us-east-1:778185677715:secret:dawgs-armageddon/rds/mysql/-lbwMwX",
+    "Name": "dawgs-armageddon/rds/mysql/",
+    "VersionId": "c9999cce-abf1-4b46-b830-700f787b3d71",
+    "SecretString": "{\"username\":\"admin\",\"password\":\"DawgsRDSPass123\",\"engine\":\"mysql\",\"host\":\"lab-mysql.c89ykq22i31z.us-east-1.rds.amazonaws.com\",\"port\":3306,\"dbInstanceIdentifier\":\"lab-mysql\"}",
+    "VersionStages": [
+        "AWSCURRENT"
+    ],
+    "CreatedDate": "2026-02-21T23:37:00.456000+00:00"
+#######
+
+mysql -h lab-mysql.c89ykq22i31z.us-east-1.rds.amazonaws.com -u admin -p
+Enter password: 'password doesn't show when you paste it.'
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MySQL connection id is 60
+Server version: 8.4.7 Source distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+#######
+
+SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+
+#######
+
+CREATE DATABASE labdb;
+Query OK, 1 row affected (0.006 sec)
+
+#######
+
+SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| labdb              |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+
+#######
+
+exit
+Bye
+
+#######
+
+sudo systemctl restart rdsapp
+
+
+#######
+      http://98.92.180.189/init
+      http://98.92.180.189/add?note=first_note
+      http://98.92.180.189/list
+#######
+
+Initialized labdb + notes table.
+Inserted note: first_note
+
+Notes
+1: first_note
+#######
+
+Inserted note: reiteration
+
+Notes
+2: reiteration
+1: first_note
+
+#######
+
+Inserted note: obliteration_of_impostor_syndrome
+
+Notes
+3: obliteration_of_impostor_syndrome
+2: reiteration
+1: first_note
+
+
+Started with and had a secrets manager configuration which now is dead.
+The IAM role and policy along with the user_data_script as was said is important to keep streamlined.
+
+SECRET_ID = os.environ.get("SECRET_ID", "dawgs-armageddon/rds/mysql")
+
+For me this was the line that kept killing my deployment. There is no wildcard needed in the user_data_script.
+ Had to launch 3 instances, must get running instance ID again.
+######
+
+ aws ec2 describe-instances \
+  --filters "Name=tag:Name,Values=lab-ec2-app" \
+  --query "Reservations[].Instances[].InstanceId"
+[
+    "i-0c2142984aaf3772e",
+    "i-049d2fe74d3782ba8",
+    "i-0df2ddcad1ffdf017"
+]
+######
+
+aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query 'Reservations[].Instances[*].[InstanceId,State.Name,PrivateIpAddress]'
+[
+    [
+        [
+            "i-0df2ddcad1ffdf017",
+            "running",
+            "10.190.1.213"
+        ]
+    ]
+]
+
+
+######
+
+REGION="${REGION:-us-east-1}"
+INSTANCE_ID="${INSTANCE_ID:-i-0df2ddcad1ffdf017}"
+DB_ID="${DB_ID:-lab-mysql}"                   # RDS DBInstanceIdentifier
+DB_PORT="${DB_PORT:-3306}"               # optional override
+OUT_JSON="${OUT_JSON:-gate_result.json}"
+
+chmod +x gate_network_db.sh
+REGION=us-east-1 INSTANCE_ID=i-0df2ddcad1ffdf017 DB_ID=lab-mysql ./gate_network_db.sh
+
+=== SEIR Gate: Network + RDS Verification ===
+Timestamp (UTC): 2026-02-22T01:19:48Z
+Region:          us-east-1
+EC2 Instance:    i-0df2ddcad1ffdf017
+RDS Instance:    lab-mysql
+Engine:          mysql
+DB Port:         3306
+Caller ARN:      arn:aws:iam::778185677715:user/awscli
+-------------------------------------------
+PASS: aws sts get-caller-identity succeeded (credentials OK).
+PASS: RDS instance exists (lab-mysql).
+PASS: RDS is not publicly accessible (PubliclyAccessible=False).
+PASS: discovered DB port = 3306 (engine=mysql).
+PASS: EC2 security groups resolved (i-0df2ddcad1ffdf017): sg-0e13d5c808412fafe
+PASS: RDS security groups resolved (lab-mysql): sg-02f38cf01d520b7bc
+PASS: RDS SG allows DB port 3306 from EC2 SG (SG-to-SG ingress present).
+INFO: private subnet check disabled (CHECK_PRIVATE_SUBNETS=false).
+
+RESULT: PASS
+===========================================
+
+Wrote: gate_result.json
+
+######
+
+chmod +x gate_secrets_and_role.sh
+REGION=us-east-1 INSTANCE_ID=i-0df2ddcad1ffdf017 SECRET_ID=dawgs-armageddon/rds/mysql/ ./gate_secrets_and_role.sh
+
+=== SEIR Gate: Secrets + EC2 Role Verification ===
+Timestamp (UTC): 2026-02-22T01:24:11Z
+Region:          us-east-1
+Instance ID:     i-0df2ddcad1ffdf017
+Secret ID:       dawgs-armageddon/rds/mysql/
+Resolved Role:   lab1a-run-2
+Caller ARN:      arn:aws:iam::778185677715:user/awscli
+-----------------------------------------------
+PASS: aws sts get-caller-identity succeeded (credentials OK).
+PASS: secret exists and is describable (dawgs-armageddon/rds/mysql/).
+INFO: rotation requirement disabled (REQUIRE_ROTATION=false).
+PASS: no resource policy found (OK) or not applicable (dawgs-armageddon/rds/mysql/).
+PASS: instance has IAM instance profile attached (i-0df2ddcad1ffdf017).
+PASS: resolved instance profile -> role (lab1a-run-2 -> lab1a-run-2).
+INFO: EXPECTED_ROLE_NAME not set; using resolved role (lab1a-run-2).
+INFO: on-instance checks skipped (not running as expected role on EC2).
+
+Warnings:
+  - WARN: current caller ARN is not assumed-role/lab1a-run-2 (you may be running off-instance).
+
+RESULT: PASS
+===============================================
+
+Wrote: gate_result.json
+
+######
+
+ chmod +x run_all_gates.sh
+REGION=us-east-1 INSTANCE_ID=i-0df2ddcad1ffdf017 SECRET_ID=dawgs-armageddon/rds/mysql/ DB_ID=lab-MySQL ./run_all_gates.sh
+=== Running Gate 1/2: secrets_and_role ===
+
+=== SEIR Gate: Secrets + EC2 Role Verification ===
+Timestamp (UTC): 2026-02-22T01:27:45Z
+Region:          us-east-1
+Instance ID:     i-0df2ddcad1ffdf017
+Secret ID:       dawgs-armageddon/rds/mysql/
+Resolved Role:   lab1a-run-2
+Caller ARN:      arn:aws:iam::778185677715:user/awscli
+-----------------------------------------------
+PASS: aws sts get-caller-identity succeeded (credentials OK).
+PASS: secret exists and is describable (dawgs-armageddon/rds/mysql/).
+INFO: rotation requirement disabled (REQUIRE_ROTATION=false).
+PASS: no resource policy found (OK) or not applicable (dawgs-armageddon/rds/mysql/).
+PASS: instance has IAM instance profile attached (i-0df2ddcad1ffdf017).
+PASS: resolved instance profile -> role (lab1a-run-2 -> lab1a-run-2).
+INFO: EXPECTED_ROLE_NAME not set; using resolved role (lab1a-run-2).
+INFO: on-instance checks skipped (not running as expected role on EC2).
+
+Warnings:
+  - WARN: current caller ARN is not assumed-role/lab1a-run-2 (you may be running off-instance).
+
+RESULT: PASS
+===============================================
+
+Wrote: gate_result.json
+=== Running Gate 2/2: network_db ===
+
+=== SEIR Gate: Network + RDS Verification ===
+Timestamp (UTC): 2026-02-22T01:28:13Z
+Region:          us-east-1
+EC2 Instance:    i-0df2ddcad1ffdf017
+RDS Instance:    lab-MySQL
+Engine:          mysql
+DB Port:         3306
+Caller ARN:      arn:aws:iam::778185677715:user/awscli
+-------------------------------------------
+PASS: aws sts get-caller-identity succeeded (credentials OK).
+PASS: RDS instance exists (lab-MySQL).
+PASS: RDS is not publicly accessible (PubliclyAccessible=False).
+PASS: discovered DB port = 3306 (engine=mysql).
+PASS: EC2 security groups resolved (i-0df2ddcad1ffdf017): sg-0e13d5c808412fafe
+PASS: RDS security groups resolved (lab-MySQL): sg-02f38cf01d520b7bc
+PASS: RDS SG allows DB port 3306 from EC2 SG (SG-to-SG ingress present).
+INFO: private subnet check disabled (CHECK_PRIVATE_SUBNETS=false).
+
+RESULT: PASS
+===========================================
+
+Wrote: gate_result.json
+
