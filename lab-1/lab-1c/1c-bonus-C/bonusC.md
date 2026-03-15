@@ -1,4 +1,4 @@
-# Lab 1C — Bonus B
+# Lab 1C — Bonus C
 ## Student Verification Report
 ### Account: 778185677715 | Domain: thedawgs2025.click
 
